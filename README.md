@@ -99,9 +99,18 @@ Fetch từ: `wss://stream.binance.com/stream?streams=%s@markPrice@1s`
 ![Screenshot 2024-12-07 213910](https://github.com/user-attachments/assets/93d6a7aa-db6f-4fc4-8e07-6080ed67835f)
 
 - **TH3: `symbol` tồn tại**  
-  Nếu Binance trả về thông tin hợp lệ, server sẽ xử lý và gửi lại cho người dùng.
+  Nếu Binance trả về thông tin hợp lệ, server sẽ xử lý và gửi lại cho người dùng sau mỗi 1 giây.
 ![Screenshot 2024-12-07 214108](https://github.com/user-attachments/assets/b6c13682-8c2e-4394-a02f-b9a971ec3d90)
-
+  Thông tin trả về sẽ có định dạng như sau:
+  ```json
+  {
+    "eventTime": "2021-12-04 15:53:23",
+    "fundingCountDown": "00:06:37",
+    "fundingRate": "0.00039888",
+    "symbol": "QTUMUSDT"
+  }
+  ```
+  
 ---
 
 ### 2. Lấy giá Kline
@@ -116,16 +125,35 @@ Fetch từ: `wss://stream.binance.com/stream?streams=%s@kline_1s`
 
 **Xử lý:**
 - **TH1: Không có quyền truy cập**  
-  Nếu role thấp hơn VIP2, socket sẽ tự động đóng sau 5 giây.
-
+  Nếu role thấp hơn VIP2, socket sẽ tự động đóng sau 5 giây. (Hiện tại đang bị lỗi)
+  
 - **TH2: Thiếu `symbol`**  
-  Socket sẽ tự động đóng sau 5 giây.
+  Socket sẽ tự động đóng sau 5 giây, trả về mã lỗi 1002.
+![Screenshot 2024-12-07 225511](https://github.com/user-attachments/assets/ea2afc85-c89d-465a-80a8-f6228df8189a)
 
 - **TH3: `symbol` không tồn tại**  
-  Socket sẽ tự động đóng sau 5 giây.
+  Socket sẽ tự động đóng sau 5 giây, trả về mã lỗi.
+![Screenshot 2024-12-07 225623](https://github.com/user-attachments/assets/0c578de1-ddf3-4982-a1b9-a907d1e366d4)
 
 - **TH4: `symbol` tồn tại**  
   Server trả về response sau 1 giây.
+![Screenshot 2024-12-07 225706](https://github.com/user-attachments/assets/19ed2f6c-f7bb-42a8-b4c8-b0ed41d93901)
+  Thông tin trả về sẽ có định dạng như sau:
+  ```json
+  {
+    "baseAssetVolume": "0.06551000",
+    "closeTime": "2024-12-04 16:28:22",
+    "eventTime": "2024-12-04 16:28:23",
+    "highPrice": "94984.14000000",
+    "lowPrice": "94984.13000000",
+    "openPrice": "94984.14000000",
+    "quoteAssetVolume": "6222.4105860",
+    "startTime": "2024-12-04 16:28:22",
+    "symbol": "BTCUSDT",
+    "takerBuyBaseVolume": "0.02293000",
+    "takerBuyQuoteVolume": "2177.98633020"
+  }
+  ```
 
 ---
 
@@ -141,11 +169,24 @@ Fetch từ: `https://api.coingecko.com/api/v3/coins/%s`
   Server sẽ đóng socket và trả về:
   - Mã lỗi: `1000`
   - Message: `Symbol missing or invalid`
+![Screenshot 2024-12-08 000107](https://github.com/user-attachments/assets/25c374d6-c98e-4cce-a077-d493c5aa48ce)
 
 - **TH2: `symbol` không tồn tại**  
   Server sẽ đóng socket và trả về:
   - Mã lỗi: `1000`
   - Message: `Symbol missing or invalid`
+![Screenshot 2024-12-08 000239](https://github.com/user-attachments/assets/43fcfb95-d898-46fc-8eca-fddb0b54dadb)
+
 
 - **TH3: `symbol` tồn tại**  
   Server trả về response cho người dùng và tự động cập nhật sau 15 phút.
+  ![image](https://github.com/user-attachments/assets/d1b65ca5-ae91-484e-980d-f3fbe4744fd5)
+  
+  ```json
+  {
+    "symbol": "btc",
+    "market_cap": 1973049246845,
+    "24h_volume": 84464126237
+  }
+  ```
+
